@@ -1,0 +1,26 @@
+{
+  "name": "agentic",
+  "version": "1.0.0",
+  "description": "A platform for constructing organic, self-organizing agent communities",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "agents",
+    "dci",
+    "ollama",
+    "llm"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "js-yaml": "^4.1.0",
+    "node-fetch": "^3.3.2",
+    "open": "^10.1.0",
+    "simple-git": "^3.27.0"
+  }
+}

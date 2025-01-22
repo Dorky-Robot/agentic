@@ -1,0 +1,63 @@
+# Example community configuration for weekend activity planning
+name: weekend_planner
+
+# Natural language descriptions of model capabilities
+modelDescriptions:
+  llama3.3: Latest and most capable model. Very smart but slower. Best for complex reasoning and detailed analysis.
+  llama3.2: Balanced model. Moderately fast with good capabilities. Good for general tasks.
+  qwen2.5-coder: Specialized for code generation and technical tasks. Fast for programming-related queries.
+  gemma2: Efficient and quick model. Good for simple tasks and rapid responses.
+  nomic-embed-text: Very fast, lightweight model. Best for quick text analysis and simple tasks.
+
+# Specialized agents in the community
+agents:
+  - name: activity_researcher
+    specialty: research
+    knowledge:
+      - pattern: Find indoor activities
+        implementation: |
+          function findIndoorActivities(weather, budget) {
+            const activities = {
+              lowBudget: ['board games', 'movie night', 'cooking', 'crafts'],
+              mediumBudget: ['museum visits', 'indoor rock climbing', 'pottery class'],
+              highBudget: ['spa day', 'indoor skydiving', 'cooking class']
+            };
+            return activities[`${budget}Budget`] || activities.lowBudget;
+          }
+
+  - name: weather_analyzer
+    specialty: weather
+    knowledge:
+      - pattern: Check weather suitability
+        implementation: |
+          function isOutdoorWeatherSuitable(forecast) {
+            return !forecast.includes('rain') && 
+                   !forecast.includes('storm') && 
+                   parseInt(forecast.temperature) > 15;
+          }
+
+  - name: social_coordinator
+    specialty: social
+    knowledge:
+      - pattern: Group size optimization
+        implementation: |
+          function suggestGroupSize(activity) {
+            const groupSizes = {
+              'hiking': { min: 2, max: 6 },
+              'board games': { min: 3, max: 8 },
+              'dinner': { min: 2, max: 10 }
+            };
+            return groupSizes[activity] || { min: 1, max: 4 };
+          }
+
+# Contexts define how agents work together
+contexts:
+  weekend_planning:
+    roles:
+      - researcher
+      - weather_analyst
+      - social_coordinator
+    roleAssignments:
+      researcher: activity_researcher
+      weather_analyst: weather_analyzer
+      social_coordinator: social_coordinator
