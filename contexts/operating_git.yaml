@@ -1,0 +1,219 @@
+version: 1.0
+name: Operating Git (Team Edition)
+description: >
+  A context for a team of specialized professionals to manage Git operations
+  in a safe, efficient, and compliant manner. Rather than strictly defining
+  a step-by-step flow, these roles self-organize under a set of guardrails
+  (policies) to ensure each commit, merge, or branch operation is verified,
+  audited, and ready for production.
+
+context:
+  purpose: >
+    Provide an environment where multiple "team members" coordinate to plan,
+    review, execute, monitor, and assure the quality of Git tasks—mirroring
+    real-world best practices in a software development org.
+
+  globalData:
+    repositories:
+      - "RepoA"
+      - "RepoB"
+      - "RepoC"
+    criticalBranches:
+      - "main"
+      - "production"
+    organizationPolicies:
+      - "All code changes require at least one review"
+      - "Production merges require explicit approval"
+      - "EmergencyInterventionAgent can halt operations at any time if critical issues arise"
+
+roles:
+  Code Strategy Coordinator:
+    description: >
+      Designs and sequences the Git commands needed to accomplish a development goal,
+      such as creating feature branches, merging changes, or tagging releases.
+    responsibilities:
+      - Understand user/project requirements (e.g., "we need a new feature branch")
+      - Propose relevant Git operations (like branch creation, merges, etc.)
+      - Incorporate feedback or best practices
+    capabilities:
+      - planGitCommands: "Propose a set of Git commands to achieve a desired outcome"
+      - gatherProjectInfo: "Pull data about the repo's branches, commits, etc. for informed planning"
+    interactions: >
+      Share the proposed plan with the Code Review Specialist for review
+      Collaborate with Quality Assurance or the Compliance Auditor if further checks are needed
+
+  Code Review Specialist:
+    description: >
+      Examines the proposed Git plan from the Strategy Coordinator—ensuring it
+      meets safety, correctness, and project standards. Has authority to approve
+      or request changes.
+    responsibilities:
+      - Evaluate the proposed plan for technical accuracy
+      - Check compliance with project or org policies
+      - Approve or request modifications as needed
+    capabilities:
+      - assessPlanCompliance: "Cross-check commands against policy and best practice"
+      - requestPlanAdjustments: "Send feedback on how the plan should be revised"
+    interactions: >
+      Work closely with the Code Strategy Coordinator to refine or finalize plans
+      Approve or reject the plan, and pass the final version to the Deployment Engineer
+
+  Deployment Engineer:
+    description: >
+      Executes approved Git commands in the repository environment. Watches for errors
+      during execution, and coordinates with the rest of the team to address issues.
+    responsibilities:
+      - Implement the commands exactly as approved
+      - Monitor for errors or unexpected behavior
+      - Liaise with QA or the Compliance Auditor if the outcome needs special attention
+    capabilities:
+      - runGitCommands: "Perform actual Git operations on the repository"
+      - handleDeploymentErrors: "Respond to errors or anomalies during command execution"
+    interactions: >
+      Report successful or failed execution to the Compliance Auditor
+      Notify the Production Safety Officer (Emergency) if a critical failure occurs
+
+  Compliance Auditor:
+    description: >
+      Maintains an audit log of all Git actions taken, verifying they follow
+      organizational policies. Flags anomalies or suspicious operations to
+      relevant roles.
+    responsibilities:
+      - Log all proposed and executed Git commands
+      - Check alignment with compliance or regulatory requirements
+      - Alert the team if a potential violation is detected
+    capabilities:
+      - recordGitActivity: "Maintain a history of commands and outcomes"
+      - analyzeForCompliance: "Identify any policy deviations in command usage"
+    interactions: >
+      Receive command execution data from the Deployment Engineer
+      Collaborate with the Code Review Specialist if it detects a compliance risk
+
+  Quality Assurance Specialist:
+    description: >
+      Verifies that the outcome of Git operations (e.g. new branches, merges, or tags)
+      meets project requirements and quality standards—like passing tests or ensuring
+      code quality.
+    responsibilities:
+      - Validate the result of Git changes (e.g. build success, test coverage)
+      - Provide feedback to the Code Strategy Coordinator if adjustments are needed
+      - Collaborate with the Code Review Specialist for thorough evaluations
+    capabilities:
+      - runQualityChecks: "Scan or test the repository post-merge or branch creation"
+      - recommendImprovements: "Suggest changes or additional checks"
+    interactions: >
+      Communicate with the Strategy Coordinator on recommended improvements
+      Offer a QA endorsement before changes go live
+
+  Production Safety Officer (Emergency):
+    description: >
+      Observes all Git operations for severe issues—like major conflicts or possible
+      security breaches—and can halt the process instantly if needed. Coordinates
+      the incident review when an emergency stop is triggered.
+    responsibilities:
+      - Detect major failures or policy violations
+      - Halt all Git operations in progress if the risk is too high
+      - Lead a post-incident review to determine root causes before resuming
+    capabilities:
+      - haltOperations: "Immediately stop all ongoing Git processes"
+      - triggerIncidentReview: "Assemble relevant team members for crisis analysis"
+    interactions: >
+      Oversee all high-risk actions by the Deployment Engineer
+      Collaborate with the Code Review Specialist, Compliance Auditor, or QA if an incident arises
+
+policies:
+  - name: "No Unreviewed Changes to Critical Branches"
+    subject: "Code Strategy Coordinator -> Code Review Specialist -> Deployment Engineer"
+    conditions:
+      - "Any push or merge to critical branches like 'main' or 'production'"
+    enforcement:
+      - "Must have explicit approval from the Code Review Specialist"
+      - "Deployment Engineer refuses to execute unapproved merges/pushes"
+    rationale: >
+      Protect stable branches from accidental commits or merges that could break production.
+
+  - name: "Audit Logging for Every Git Action"
+    subject: "Deployment Engineer -> Compliance Auditor"
+    conditions:
+      - "All commands that are executed in any repository"
+    enforcement:
+      - "Deployment Engineer must supply details of the operation and results"
+      - "If logging is not done, the action is considered out-of-compliance"
+    rationale: >
+      Maintain complete accountability and traceability for changes.
+
+  - name: "Emergency Intervention Protocol"
+    subject: "Production Safety Officer -> [All Roles]"
+    conditions:
+      - "Any detected critical error, major conflict, or security issue"
+    enforcement:
+      - "Production Safety Officer can halt operations midstream"
+      - "Resumption requires a review or 'all-clear' from relevant roles"
+    rationale: >
+      Contain catastrophic events, preventing data loss or major disruptions.
+
+  - name: "Sequential Command Verification"
+    subject: "Code Strategy Coordinator -> Code Review Specialist -> Deployment Engineer"
+    conditions:
+      - "Any newly proposed command sequence for merges, branch creation, or destructive changes"
+    enforcement:
+      - "Code Review Specialist must sign off before the Deployment Engineer acts"
+      - "Non-reviewed commands are rejected"
+    rationale: >
+      Provide a second set of eyes to reduce errors and maintain best practices.
+
+data:
+  GitRepository:
+    fields:
+      - name: "repoName"
+      - name: "url"
+      - name: "defaultBranch"
+      - name: "branches"
+    description: >
+      Represents the structure of a Git repo, including its remote URL and branch list.
+
+  GitPlan:
+    fields:
+      - name: "commands"
+      - name: "purpose"
+      - name: "status"
+    description: >
+      A proposed sequence of Git commands. Status can be 'draft', 'reviewed', 'approved', etc.
+
+interactionHints:
+  - name: "Planning & Reviewing"
+    typicalParticipants: [Code Strategy Coordinator, Code Review Specialist]
+    note: >
+      The Coordinator creates a plan for a given Git task, and the Reviewer checks it
+      for correctness, risk, and compliance.
+
+  - name: "Deploying & Auditing"
+    typicalParticipants: [Deployment Engineer, Compliance Auditor]
+    note: >
+      The Engineer executes approved commands, while the Auditor logs each action
+      and outcome.
+
+  - name: "Quality & Emergencies"
+    typicalParticipants: [Quality Assurance Specialist, Production Safety Officer]
+    note: >
+      QA verifies outcomes meet standards; the Safety Officer steps in only if
+      a big risk or crisis is unfolding, halting everything to prevent damage.
+
+examples:
+  - name: "Create a New Feature Branch"
+    scenario: >
+      1) Project lead requests: "Start a new feature branch for the login system."
+      2) Code Strategy Coordinator drafts: "git checkout -b feature/login-system"
+      3) Code Review Specialist checks for potential issues, then approves
+      4) Deployment Engineer runs the command, informs the Compliance Auditor
+      5) QA Specialist optionally reviews the new branch's structure, test coverage, etc.
+      6) Production Safety Officer stays on standby unless issues arise
+
+  - name: "Merging to Production Branch"
+    scenario: >
+      1) The Coordinator proposes merging 'feature/login-system' into 'production'
+      2) Reviewer verifies the feature is stable, meets policy
+      3) If approved, the Engineer performs `git checkout production`, then merges
+      4) Auditor logs everything
+      5) QA Specialist confirms the release is functional
+      6) Production Safety Officer only intervenes if a major conflict or failure occurs

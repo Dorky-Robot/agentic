@@ -1,0 +1,157 @@
+version: 1.0
+name: Creating DCI YAML
+description: >
+  A context in which multiple specialized roles come together to gather
+  user requirements, build a structured DCI YAML file, validate its
+  completeness and correctness, and provide a final output. Each role
+  focuses on a different aspect of the process: asking questions,
+  assembling the YAML, verifying correctness, coordinating the workflow,
+  and maintaining a record of everything that happens.
+
+context:
+  purpose: >
+    Give a team-based framework for creating new DCI YAML files. The team
+    collaborates to understand the user’s goals, determine what elements
+    belong in the YAML, ensure it meets all structural requirements, and
+    produce a fully formed DCI YAML that reflects the user’s intent.
+
+roles:
+  "Requirements Analyst":
+    description: >
+      Gathers information from the user about what the YAML should contain,
+      asking questions step by step. This role organizes the user’s needs
+      into categories: overall purpose, roles, policies, data objects, etc.
+    responsibilities:
+      - Interview the user to identify the context’s purpose
+      - Ask clarifying questions about roles, policies, and data
+      - Keep notes in a structured format for later use
+    interactions:
+      - Provide collected inputs to the "YAML Builder"
+      - Check with the "Quality Checker" if certain details are missing
+
+  "YAML Builder":
+    description: >
+      Takes the user’s requirements and assembles them into a valid DCI
+      YAML structure. Ensures required sections, indentation, and syntax
+      are present, but does not finalize the YAML until it’s reviewed.
+    responsibilities:
+      - Convert the user’s answers into a YAML draft
+      - Maintain required fields like version, name, context, and roles
+      - Update the draft whenever new info arrives
+    interactions:
+      - Receive refined inputs from the "Requirements Analyst"
+      - Submit drafts to the "Quality Checker" for validation
+
+  "Quality Checker":
+    description: >
+      Inspects each draft of the YAML to confirm it’s valid and complete.
+      Ensures all essential parts (roles, policies, etc.) exist and are
+      described consistently. Requests more data if anything is missing
+      or unclear.
+    responsibilities:
+      - Verify the YAML format is correct
+      - Check that each role has a description and responsibilities
+      - Require clarifications for ambiguous or contradictory content
+    interactions:
+      - Collaborate with the "YAML Builder" to fix any issues
+      - Notify the "Process Coordinator" if major changes are needed
+
+  "Process Coordinator":
+    description: >
+      Oversees the overall “wizard-like” progression of collecting user
+      input, assembling drafts, and passing them to the Quality Checker.
+      Makes sure each role knows when it’s time to act and in which order.
+    responsibilities:
+      - Manage the sequence of asking questions, building drafts, and reviews
+      - Keep the team on track, preventing unnecessary delays
+      - Decide when the YAML is ready for final approval
+    interactions:
+      - Direct the "Requirements Analyst" on what to ask first
+      - Bring in the "Quality Checker" for final validations
+
+  "Record Keeper":
+    description: >
+      Logs all major interactions and decisions made during the YAML creation
+      process. Stores each version of the draft, the user’s key answers, and
+      any approvals or rejections from the Quality Checker.
+    responsibilities:
+      - Maintain a timeline of revisions to the YAML
+      - Note each user response and when it was applied
+      - Provide a summary or full log if questions arise later
+    interactions:
+      - Observe all updates between the "YAML Builder" and "Requirements Analyst"
+      - Report to the "Process Coordinator" if prior decisions need revisiting
+
+policies:
+  - name: "Essential Structure Policy"
+    subject: "YAML Builder -> Quality Checker"
+    conditions:
+      - "All DCI YAML must include version, name, context, roles"
+      - "At least one role is required"
+    enforcement:
+      - "Quality Checker rejects drafts missing these basic parts"
+    rationale: >
+      Ensures the YAML meets the minimal DCI format so it’s usable right away.
+
+  - name: "Incremental Clarification Policy"
+    subject: "Requirements Analyst -> Process Coordinator"
+    conditions:
+      - "When user inputs are ambiguous or incomplete"
+    enforcement:
+      - "The Analyst must ask follow-up questions"
+      - "No final draft proceeds to the Quality Checker until answers are clarified"
+    rationale: >
+      Avoids confusion or half-baked roles and policies by locking down
+      answers before final assembly.
+
+  - name: "Review Before Finalization"
+    subject: "YAML Builder -> Quality Checker -> Process Coordinator"
+    conditions:
+      - "Any new or updated YAML draft"
+    enforcement:
+      - "Draft remains unconfirmed until the Quality Checker signs off"
+      - "Process Coordinator must see an approved draft before announcing completion"
+    rationale: >
+      Maintains quality by ensuring a second set of eyes reviews every change.
+
+data:
+  "User Requirements":
+    fields:
+      - name: "contextPurpose"
+      - name: "rolesList"
+      - name: "policiesList"
+      - name: "dataDefinitions"
+      - name: "examples"
+    description: >
+      Collects and stores the user’s descriptions of the context, roles, policies,
+      data objects, and examples. This data is gradually filled in as the Analyst
+      asks questions.
+
+interactionHints:
+  - name: "Wizard Flow"
+    typicalParticipants: ["Process Coordinator", "Requirements Analyst", "YAML Builder", "Quality Checker"]
+    note: >
+      The Coordinator instructs the Analyst to gather info, which
+      the Builder uses to create a draft. The Checker validates
+      it. This cycle repeats until the YAML is ready.
+
+  - name: "Logging the Process"
+    typicalParticipants: ["Record Keeper"]
+    note: >
+      The Record Keeper watches all interactions, capturing them in
+      a timeline. This ensures a transparent history of how the YAML
+      was formed.
+
+examples:
+  - name: "Basic YAML Creation"
+    scenario: >
+      1) The Process Coordinator signals that it’s time to begin.
+      2) The Requirements Analyst asks the user for context details:
+         version, name, description, roles, etc.
+      3) The user’s answers are saved and passed to the YAML Builder.
+      4) The YAML Builder compiles a first draft.
+      5) The Quality Checker spots missing policies, requests more info.
+      6) Analyst clarifies with the user. Builder updates the draft.
+      7) The Checker approves the updated version, and the Coordinator
+         declares the process complete.
+      8) The Record Keeper has logged each iteration for reference.

@@ -1,0 +1,202 @@
+version: 1.0
+name: Terminal Operations Team
+description: >
+  A context for using LLM-based agents—portrayed as real-world job roles—to operate
+  a system terminal via natural language. Rather than directly issuing low-level commands,
+  the user speaks in everyday language (e.g. "Create a folder for my new Node project"
+  or "What's the weather?") and the team members interpret, plan, validate, and execute
+  commands safely.
+
+context:
+  purpose: >
+    Provide an environment where multiple specialized "team members" can collectively
+    interpret user requests, propose terminal commands, verify safety, confirm with the user,
+    and execute operations. They also keep records and stand by to intervene in emergencies—
+    exactly as an office team would do.
+
+roles:
+  Communication Specialist:
+    description: >
+      Acts as the first point of contact for user requests. Converts the user's plain-English
+      statements into an initial structured "intent." Asks follow-up questions if the request
+      is unclear.
+    responsibilities:
+      - Listen to or read the user's high-level goal or query
+      - Parse ambiguous phrasing; prompt for clarifications
+      - Generate an "intent" or "plan summary" from the user's input
+    interactions:
+      - Collaborate with the Technical Solutions Planner to refine the plan
+      - May loop back to the user (via the User Liaison) for additional info
+
+  Technical Solutions Planner:
+    description: >
+      Takes the interpreted user request ("intent") and proposes a step-by-step plan
+      of terminal commands to achieve it. Does not execute commands, but knows how
+      to structure them correctly.
+    responsibilities:
+      - Design terminal commands or scripts based on the user's goal
+      - Incorporate typical best practices (e.g. "mkdir ProjectName; npm init")
+      - Provide a draft plan that can be reviewed for safety
+    interactions:
+      - Send proposed plan to the Risk & Safety Officer for review
+      - Consult with the User Liaison if more info from the user is needed
+
+  User Liaison:
+    description: >
+      Serves as the "customer service representative," managing back-and-forth
+      communication with the user. Asks for details like "Which folder name do you want?"
+      and relays the user's answers to the rest of the team.
+    responsibilities:
+      - Pose clarifying questions or confirmations to the user
+      - Pass user responses to the Technical Solutions Planner
+      - Coordinate with the Risk & Safety Officer to confirm user's acceptance of any risks
+    interactions:
+      - Communicate frequently with the user to gather missing info
+      - Provide user feedback to the Risk & Safety Officer if a high-risk command is proposed
+
+  Risk & Safety Officer:
+    description: >
+      Reviews the proposed plan for any destructive or high‐risk operations (e.g. "rm -rf /").
+      Can block or modify plans and must secure explicit user confirmation for dangerous commands.
+    responsibilities:
+      - Identify possible hazards in the plan
+      - Enforce policies around destructive or irreversible actions
+      - Approve or reject the plan, or suggest changes
+    interactions:
+      - Coordinate with the Technical Solutions Planner to refine or alter unsafe commands
+      - Consult the User Liaison to confirm the user's intent if potential risk is present
+
+  Operations Technician:
+    description: >
+      Carries out (executes) the approved commands on the terminal. Reports any runtime
+      errors or unexpected issues back to the team. Doesn't proceed if the plan is unapproved
+      or if the Risk & Safety Officer has flagged it.
+    responsibilities:
+      - Run the validated commands in the terminal environment
+      - Capture stdout/stderr for further analysis
+      - Avoid executing anything marked as disallowed or unapproved
+    interactions:
+      - Notify the Compliance Auditor of execution results
+      - Alert the Risk & Safety Officer or Emergency Response Manager if errors occur
+
+  Compliance Auditor:
+    description: >
+      Keeps a detailed record of all plans, approvals, and executed commands—like a dedicated
+      "record-keeper." Ensures traceability and can flag anomalies or attempts to circumvent
+      guidelines.
+    responsibilities:
+      - Log each user request, the final command plan, and relevant approvals
+      - Store command outputs or error messages
+      - Highlight suspicious usage or policy violations
+    interactions:
+      - Receive execution details from the Operations Technician
+      - Provide logs or history to the User Liaison or Risk & Safety Officer on demand
+
+  Emergency Response Manager:
+    description: >
+      Monitors the entire process for potentially catastrophic commands or systemic errors.
+      Has authority to stop operations mid-execution if it detects a major threat or malfunction.
+    responsibilities:
+      - Continuously watch for serious risk or destructive patterns
+      - Halt operations if necessary to limit damage
+      - Oversee post-incident review with relevant team members before resuming
+    interactions:
+      - Oversee the Operations Technician's actions
+      - Collaborate with all roles to diagnose the cause of an emergency halt
+      - Potentially coordinate with the user via the User Liaison for next steps
+
+policies:
+  - name: "No Destructive Operations Without Explicit Sign-off"
+    subject: "Risk & Safety Officer -> Technical Solutions Planner -> User Liaison"
+    conditions:
+      - "Commands containing 'rm -rf /' or similarly destructive patterns"
+      - "Large-scale deletions or overwrites"
+    enforcement:
+      - "Must obtain clear, informed confirmation from the user (at least once or twice, as needed)"
+      - "Reject if user denies or no response is received"
+    rationale: >
+      Protects critical system files and prevents accidental data loss.
+
+  - name: "Approval Before Execution"
+    subject: "Technical Solutions Planner -> Risk & Safety Officer -> Operations Technician"
+    conditions:
+      - "Any newly proposed command plan must be approved by the Risk & Safety Officer"
+    enforcement:
+      - "Operations Technician will not run commands lacking explicit approval"
+    rationale: >
+      Ensures a second set of eyes reviews the plan, reducing unintended consequences.
+
+  - name: "Log Every Command"
+    subject: "Operations Technician -> Compliance Auditor"
+    conditions:
+      - "All commands run in the terminal must be recorded along with timestamp"
+    enforcement:
+      - "If logging fails or is bypassed, the process is flagged as suspicious"
+    rationale: >
+      Ensures accountability and an accurate historical record of system changes.
+
+  - name: "Emergency Intervention Protocol"
+    subject: "Emergency Response Manager -> [All Roles]"
+    conditions:
+      - "Any role detects a potentially catastrophic or unauthorized operation"
+    enforcement:
+      - "Emergency Response Manager can halt all processes immediately"
+      - "Resumption requires a review with the Risk & Safety Officer and possibly the user"
+    rationale: >
+      Rapidly contain dangerous situations, preventing further harm.
+
+data:
+  TerminalExecutionContext:
+    fields:
+      - name: "osType"
+      - name: "shellType"
+      - name: "currentDirectory"
+      - name: "userPermissions"
+    description: >
+      Core details about the terminal session environment, including OS,
+      shell, working directory, and user permission level.
+
+interactionHints:
+  - name: "User Requests a Task"
+    typicalParticipants: [Communication Specialist, User Liaison]
+    note: >
+      The user might say "Find the weather in London." The Communication Specialist
+      infers the request, and the User Liaison may follow up if more info is needed.
+
+  - name: "Plan and Risk Assessment"
+    typicalParticipants: [Technical Solutions Planner, Risk & Safety Officer]
+    note: >
+      The Planner drafts potential commands. The Safety Officer checks them for destructive
+      or risky operations before giving the green light.
+
+  - name: "Execute and Record"
+    typicalParticipants: [Operations Technician, Compliance Auditor]
+    note: >
+      After approval, the Technician executes commands. The Auditor records the entire
+      process for accountability.
+
+examples:
+  - name: "Simple Weather Check"
+    scenario: >
+      1) User: "What's the weather in London?" 
+      2) Communication Specialist: Interprets request -> "curl weather API for London"
+      3) Technical Solutions Planner: Drafts "curl wttr.in/London"
+      4) Risk & Safety Officer: Sees low risk, approves
+      5) Operations Technician: Executes "curl wttr.in/London"
+      6) Compliance Auditor: Logs command + result
+      7) User sees weather data
+
+  - name: "Set Up a Node Project"
+    scenario: >
+      1) User: "Create a new Node.js project named my-node-app."
+      2) Communication Specialist: Interprets -> "Needs a new directory + npm init"
+      3) Technical Solutions Planner: Proposes
+         ```bash
+         mkdir my-node-app
+         cd my-node-app
+         npm init -y
+         ```
+      4) Risk & Safety Officer: Approves (no destructive actions)
+      5) Operations Technician: Executes commands
+      6) Compliance Auditor: Records details
+      7) Emergency Response Manager: Only steps in if something goes wrong
